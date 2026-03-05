@@ -90,6 +90,32 @@ app.get("/logout", (req, res) => {
 });
 
 // =============================
+// REGISTRO
+// =============================
+
+app.get("/registro", (req, res) => {
+  res.render("registro");
+});
+
+app.post("/registro", async (req, res) => {
+  const { username, password } = req.body;
+
+  // Encriptar contraseña
+  const hash = await bcrypt.hash(password, 10);
+
+  try {
+    await pool.query(
+      "INSERT INTO usuarios (username, password) VALUES ($1,$2)",
+      [username, hash]
+    );
+
+    res.redirect("/login");
+
+  } catch (error) {
+    res.send("El usuario ya existe");
+  }
+});
+// =============================
 // DASHBOARD (PROTEGIDO)
 // =============================
 
