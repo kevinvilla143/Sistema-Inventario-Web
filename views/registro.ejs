@@ -1,19 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Registro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Inventario</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <h2>Registro</h2>
+  <canvas id="stars"></canvas>
+  <div class="auth-bg">
+    <div class="auth-card">
 
-  <form method="POST" action="/registro">
-    <input type="text" name="username" placeholder="Usuario" required>
-    <br><br>
-    <input type="password" name="password" placeholder="Contraseña" required>
-    <br><br>
-    <button type="submit">Registrar</button>
-  </form>
+      <!-- LOGO -->
+      <div class="auth-logo">
+      <img src="/peppa.jpg" alt="logo">
+      </div>
 
-  <a href="/login">Ir al login</a>
+      <h3>Crear cuenta</h3>
+      <p class="auth-sub">Completa los datos para registrarte</p>
+
+      <form method="POST" action="/registro">
+
+        <div class="form-gap">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="username" class="form-control" placeholder="tu_usuario" required>
+        </div>
+
+        <div class="form-gap">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <button type="submit" class="btn btn-primary w-100" style="padding:.75rem;">Registrar</button>
+        </div>
+
+      </form>
+
+      <p class="auth-link">
+        ¿Ya tienes cuenta? <a href="/login">Ir al login</a>
+      </p>
+
+    </div>
+  </div>
+  <script>
+window.onload = function(){
+
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+for(let i = 0; i < 120; i++){
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 2,
+    speed: Math.random() * 0.5
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle = "white";
+
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+    ctx.fill();
+
+    star.y += star.speed;
+
+    if(star.y > canvas.height){
+      star.y = 0;
+      star.x = Math.random() * canvas.width;
+    }
+  });
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+}
+</script>
 </body>
 </html>

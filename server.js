@@ -7,9 +7,13 @@ const path = require("path");
 
 const app = express();
 
+
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 app.set("view engine", "ejs");
