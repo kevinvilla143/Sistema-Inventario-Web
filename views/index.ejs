@@ -994,7 +994,7 @@
 
   <td>
     <span class="category-badge cat-<%= cat %>">
-      <%= _labels[cat] || cat %>
+     <%= catLabels[cat] || cat %>
     </span>
   </td>
 
@@ -1007,12 +1007,12 @@
   </td>
 
   <td>
-    <span class="stock-pill <%= _sPill %>">
-      <%= _sLabel %>
+    <span class="stock-pill <%= stockPillClass %>">
+     <%= stockLabel %>
     </span>
   </td>
             <% }) %>
-          </tbody>
+          </tbody>  
         </table>
       </div>
     </div>
