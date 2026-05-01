@@ -11,7 +11,11 @@
   <canvas id="stars"></canvas>
   <div class="auth-bg">
     <div class="auth-card">
-
+<% if (locals.flash) { %>
+  <div class="alert alert-<%= flash.type %> py-2" role="alert">
+    <%= flash.message %>
+  </div>
+<% } %>
       <!-- LOGO -->
       <div class="auth-logo">
       <img src="/peppa.jpg" alt="logo">

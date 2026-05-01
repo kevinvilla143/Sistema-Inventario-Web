@@ -1,0 +1,9 @@
+# Base de datos (ya la tienes en Render)
+DATABASE_URL=postgres://inventario_pp2p_user:CY17pIKqezFQpjjowSv5pm0ZLJZUq9Cb@dpg-d6jntcfgi27c73c5gqkg-a.oregon-postgres.render.com:5432/inventario_pp2p
+
+# IMPORTANTE: cambia esto por una clave larga y aleatoria
+# Puedes generar una en: https://generate-secret.vercel.app/32
+SESSION_SECRET=cambia_esto_por_una_clave_larga_aleatoria_minimo_32_chars
+
+# Activa cookies seguras (HTTPS) en producción
+NODE_ENV=production
