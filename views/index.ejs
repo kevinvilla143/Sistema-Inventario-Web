@@ -981,21 +981,36 @@
               const stockLabel = p.stock === 0 ? 'Sin stock' : p.stock <= p.stock_minimo ? 'Stock bajo' : 'Disponible';
               const stockPillClass = p.stock === 0 ? 'stock-zero' : p.stock <= p.stock_minimo ? 'stock-low' : 'stock-ok';
             %>
-            <tr data-name="<%= p.nombre.toLowerCase() %>" data-category="<%= _cat %>" data-price="<%= p.precio %>" data-stock="<%= p.stock %>">
-              <td class="td-name"><%= icons[cat] || '📦' %> <%= p.nombre %></td>
-              <td><span class="category-badge cat-<%= _cat %>"><%= _labels[_cat] || _cat %></span></td>
-              <td class="td-price">$<%= parseFloat(p.precio).toLocaleString('es-CO') %></td>
-              <td><%= p.stock %> uds</td>
-              <td><span class="stock-pill <%= _sPill %>"><%= _sLabel %></span></td>
-              <td class="td-actions">
-                <a href="/stock/<%= p.id %>/sumar" class="btn-stock plus">+</a>
-                <a href="/stock/<%= p.id %>/restar" class="btn-stock minus">−</a>
-                <a href="/eliminar/<%= p.id %>" class="btn-icon danger"
-                   onclick="return confirm('¿Eliminar?')" title="Eliminar">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                </a>
-              </td>
-            </tr>
+            <tr 
+  data-name="<%= p.nombre.toLowerCase() %>" 
+  data-category="<%= cat %>" 
+  data-price="<%= p.precio %>" 
+  data-stock="<%= p.stock %>"
+>
+
+  <td class="td-name">
+    <%= icons[cat] || '📦' %> <%= p.nombre %>
+  </td>
+
+  <td>
+    <span class="category-badge cat-<%= cat %>">
+      <%= _labels[cat] || cat %>
+    </span>
+  </td>
+
+  <td class="td-price">
+    $<%= parseFloat(p.precio).toLocaleString('es-CO') %>
+  </td>
+
+  <td>
+    <%= p.stock %> uds
+  </td>
+
+  <td>
+    <span class="stock-pill <%= _sPill %>">
+      <%= _sLabel %>
+    </span>
+  </td>
             <% }) %>
           </tbody>
         </table>
