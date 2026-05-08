@@ -10,6 +10,9 @@ const { body, validationResult } = require("express-validator");
 
 const app = express();
 
+// Necesario para que express-rate-limit funcione detrás del proxy de Render
+app.set("trust proxy", 1);
+
 // =============================
 // SEGURIDAD — CABECERAS HTTP
 // =============================
