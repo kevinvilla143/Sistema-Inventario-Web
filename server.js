@@ -77,7 +77,9 @@ async function initDB() {
         id SERIAL PRIMARY KEY,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
-        role TEXT DEFAULT 'user'
+        role TEXT DEFAULT 'user',
+        primer_acceso BOOLEAN DEFAULT TRUE,
+        activo BOOLEAN DEFAULT TRUE
       );
 
       CREATE TABLE IF NOT EXISTS productos (
@@ -90,6 +92,18 @@ async function initDB() {
         imagen TEXT
       );
     `);
+
+    // Agregar columnas si no existen (para actualizar DBs existentes)
+    try {
+      await client.query("ALTER TABLE usuarios ADD COLUMN primer_acceso BOOLEAN DEFAULT TRUE");
+    } catch (e) {
+      // Columna ya existe
+    }
+    try {
+      await client.query("ALTER TABLE usuarios ADD COLUMN activo BOOLEAN DEFAULT TRUE");
+    } catch (e) {
+      // Columna ya existe
+    }
 
     // Crear admin por defecto si no existe
     const adminCheck = await client.query("SELECT * FROM usuarios WHERE username = $1", ["admin"]);
@@ -146,6 +160,10 @@ function verificarAdmin(req, res, next) {
   if (!req.session.usuario || req.session.rol !== "admin") {
     setFlash(req, "danger", "No tienes permiso para realizar esta acción");
     return res.redirect("/");
+  }
+  if (req.session.adminDesactivado) {
+    setFlash(req, "danger", "Tu cuenta de administrador ha sido desactivada tras completar la configuración inicial");
+    return res.redirect("/logout");
   }
   next();
 }
@@ -230,6 +248,19 @@ app.post("/login", loginLimiter, validarUsuario, async (req, res) => {
       if (err) return res.redirect("/login");
       req.session.usuario = usuario.username;
       req.session.rol = usuario.role;
+      req.session.adminDesactivado = !usuario.activo;
+      
+      // Si es admin en primer acceso, ir a setup
+      if (usuario.role === "admin" && usuario.primer_acceso) {
+        return res.redirect("/setup-admin");
+      }
+      
+      // Si es admin pero ya no está activo, redirigir a logout
+      if (usuario.role === "admin" && !usuario.activo) {
+        setFlash(req, "danger", "Esta cuenta de administrador ya no está activa");
+        return res.redirect("/logout");
+      }
+      
       res.redirect("/");
     });
 
@@ -281,6 +312,68 @@ app.post("/registro", registroLimiter, validarUsuario, async (req, res) => {
     res.redirect("/registro");
   }
 });
+
+// =============================
+// SETUP ADMIN (PRIMER ACCESO)
+// =============================
+
+app.get("/setup-admin", (req, res) => {
+  if (!req.session.usuario || req.session.rol !== "admin") {
+    return res.redirect("/login");
+  }
+  res.render("setup-admin");
+});
+
+app.post("/setup-admin", 
+  body("nuevoUsername").trim().notEmpty().isLength({ min: 3, max: 50 }).matches(/^[a-zA-Z0-9_]+$/),
+  body("nuevoPassword").isLength({ min: 6 }).withMessage("Mínimo 6 caracteres"),
+  body("confirmarPassword").isLength({ min: 6 }),
+  async (req, res) => {
+    if (!req.session.usuario || req.session.rol !== "admin") {
+      return res.redirect("/login");
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      setFlash(req, "danger", errors.array()[0].msg);
+      return res.redirect("/setup-admin");
+    }
+
+    const { nuevoUsername, nuevoPassword, confirmarPassword } = req.body;
+
+    if (nuevoPassword !== confirmarPassword) {
+      setFlash(req, "danger", "Las contraseñas no coinciden");
+      return res.redirect("/setup-admin");
+    }
+
+    try {
+      // Verificar que el nuevo username no esté en uso
+      const usernameCheck = await pool.query("SELECT id FROM usuarios WHERE username = $1 AND username != $2", [nuevoUsername, req.session.usuario]);
+      if (usernameCheck.rows.length > 0) {
+        setFlash(req, "danger", "Ese nombre de usuario ya está en uso");
+        return res.redirect("/setup-admin");
+      }
+
+      const hashPassword = await bcrypt.hash(nuevoPassword, 10);
+      
+      // Actualizar usuario admin: cambiar username, password, marcar como primer_acceso = false, activo = false
+      await pool.query(
+        "UPDATE usuarios SET username = $1, password = $2, primer_acceso = FALSE, activo = FALSE WHERE username = $3",
+        [nuevoUsername, hashPassword, req.session.usuario]
+      );
+
+      setFlash(req, "success", "Configuración completada. Tu cuenta de administrador ha sido asegurada y desactivada.");
+      req.session.destroy(() => {
+        res.redirect("/login");
+      });
+
+    } catch (error) {
+      console.error("Error en setup-admin:", error);
+      setFlash(req, "danger", "Error al completar la configuración");
+      res.redirect("/setup-admin");
+    }
+  }
+);
 
 // =============================
 // DASHBOARD
@@ -383,3 +476,4 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor ejecutándose en puerto ${PORT}`));
+
