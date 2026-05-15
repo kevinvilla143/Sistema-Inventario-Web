@@ -58,8 +58,9 @@ async function initDB() {
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         role TEXT DEFAULT 'user'
-      );
-
+      )
+    `);
+    await client.query(`
       CREATE TABLE IF NOT EXISTS productos (
         id SERIAL PRIMARY KEY,
         nombre TEXT NOT NULL,
@@ -68,8 +69,9 @@ async function initDB() {
         stock_minimo INTEGER NOT NULL,
         categoria TEXT DEFAULT 'otro',
         imagen TEXT
-      );
-
+      )
+    `);
+    await client.query(`
       CREATE TABLE IF NOT EXISTS ventas (
         id SERIAL PRIMARY KEY,
         producto_id INTEGER REFERENCES productos(id) ON DELETE SET NULL,
@@ -78,7 +80,7 @@ async function initDB() {
         precio_unitario NUMERIC(10,2) NOT NULL,
         total NUMERIC(10,2) NOT NULL,
         fecha TIMESTAMPTZ DEFAULT NOW()
-      );
+      )
     `);
 
     const adminCheck = await client.query("SELECT * FROM usuarios WHERE username = $1", ["admin"]);
@@ -360,10 +362,13 @@ app.get("/reportes", verificarLogin, verificarAdmin, async (req, res) => {
 
     // Ingresos por día (últimos 7 días)
     const ingresosSemanales = await pool.query(`
-      SELECT TO_CHAR(fecha, 'Dy') as dia, DATE(fecha) as fecha_raw, SUM(total) as total
+      SELECT
+        TO_CHAR(DATE(fecha), 'DD/MM') as dia,
+        DATE(fecha) as fecha_raw,
+        SUM(total) as total
       FROM ventas
       WHERE fecha >= CURRENT_DATE - INTERVAL '6 days'
-      GROUP BY DATE(fecha), TO_CHAR(fecha, 'Dy')
+      GROUP BY DATE(fecha)
       ORDER BY fecha_raw ASC
     `);
 
@@ -384,8 +389,8 @@ app.get("/reportes", verificarLogin, verificarAdmin, async (req, res) => {
       totMes
     });
   } catch (error) {
-    console.error("Error en reportes:", error);
-    setFlash(req, "danger", "Error al cargar reportes");
+    console.error("Error en reportes:", error.message, error.stack);
+    setFlash(req, "danger", "Error al cargar reportes: " + error.message);
     res.redirect("/");
   }
 });
