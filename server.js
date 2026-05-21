@@ -15,7 +15,10 @@ app.set("trust proxy", 1);
 app.use(helmet({ contentSecurityPolicy: false }));
 
 // ── BASE DE DATOS ──
-const pool = require('./lib/db');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+});
 
 // ── EXPRESS CONFIG ──
 app.set("view engine", "ejs");
@@ -113,14 +116,10 @@ async function initDB() {
   }
 }
 
-if (process.env.DATABASE_URL) {
-  initDB().catch(err => {
-    console.error("❌ Error inicializando la base de datos:", err);
-    process.exit(1);
-  });
-} else {
-  console.log('Usando SQLite local (dev.db). Ejecuta `npm run init-sqlite` si necesitas crear tablas.');
-}
+initDB().catch(err => {
+  console.error("❌ Error inicializando la base de datos:", err);
+  process.exit(1);
+});
 
 // ── MIDDLEWARES ──
 function verificarLogin(req, res, next) {
