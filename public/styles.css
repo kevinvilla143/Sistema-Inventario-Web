@@ -263,7 +263,8 @@ h1, h2, h3, h4, h5, .brand-text {
 /* ── TABLA ──── */
 .table-wrapper {
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border);
   box-shadow: 0 4px 30px rgba(0,0,0,0.4);
   background: var(--surface);
@@ -456,8 +457,35 @@ h1, h2, h3, h4, h5, .brand-text {
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* ── RESPONSIVE ────────── */
-@media (max-width: 640px) {
-  .inv-navbar { padding: .85rem 1rem; }
-  .auth-card  { padding: 2rem 1.5rem; }
-  .inv-title-row { flex-direction: column; align-items: flex-start; }
+@media (max-width: 1024px) {
+  .inv-container { padding: 2rem 1rem; }
+  .inv-navbar { padding: .9rem 1.25rem; }
 }
+
+@media (max-width: 768px) {
+  .inv-navbar { padding: .8rem 1rem; gap: .5rem; }
+  .inv-navbar .brand-text { font-size: 1.05rem; }
+  .inv-title-row { flex-direction: column; align-items: flex-start; }
+  .inv-container { padding: 1.5rem .75rem; }
+  .auth-card { max-width: 420px; padding: 2rem 1.25rem; }
+  .auth-card h3 { font-size: 1.45rem; }
+  .form-control { font-size: .95rem; }
+  .btn-primary { font-size: .95rem; }
+}
+
+@media (max-width: 480px) {
+  body { padding: .75rem; }
+  .inv-navbar { padding: .6rem .75rem; }
+  .inv-container { padding: 1rem .5rem; }
+  .auth-card { padding: 1.25rem 1rem; border-radius: 12px; }
+  .auth-logo { width: 48px; height: 48px; }
+  .auth-card h3 { font-size: 1.25rem; }
+  .table thead th { display: none; }
+  .table tbody td { white-space: normal; padding: .75rem .9rem; }
+}
+
+/* Make images and media responsive */
+img, video, svg { max-width: 100%; height: auto; display: block; }
+
+/* Ensure tables can scroll on small devices */
+.table-wrapper { -webkit-overflow-scrolling: touch; }

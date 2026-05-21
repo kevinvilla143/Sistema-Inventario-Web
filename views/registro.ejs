@@ -98,6 +98,20 @@
     .auth-link { display: block; text-align: center; margin-top: 1.5rem; font-size: .875rem; color: var(--muted); }
     .auth-link a { color: var(--accent); font-weight: 500; text-decoration: none; }
     .auth-link a:hover { opacity: .75; }
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .auth-card { padding: 2rem 1.25rem; max-width: 420px; }
+      .auth-logo { width: 48px; height: 48px; }
+      h3 { font-size: 1.35rem; }
+      .auth-sub { font-size: .82rem; }
+      .form-control { font-size: .95rem; }
+      .btn-primary { font-size: .95rem; }
+    }
+    @media (max-width: 480px) {
+      .auth-card { padding: 1.25rem 1rem; border-radius: 12px; }
+      .auth-logo { width: 44px; height: 44px; }
+      h3 { font-size: 1.2rem; }
+    }
   </style>
 </head>
 <body>

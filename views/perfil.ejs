@@ -144,6 +144,18 @@
       color: var(--muted2); margin-bottom: 1.75rem;
     }
     .current-user-badge strong { color: var(--accent); }
+    @media (max-width: 900px) {
+      main { padding: 2rem 1rem; max-width: 720px; }
+    }
+    @media (max-width: 480px) {
+      .navbar { padding: 0 .75rem; }
+      main { padding: 1rem .75rem; }
+      .card { padding: 1rem; border-radius: 12px; }
+      .page-title { font-size: 1.3rem; }
+      .form-input { font-size: .95rem; }
+      .btn-save { padding: .75rem; font-size: .95rem; }
+      .current-user-badge { padding: 6px 10px; font-size: .82rem; }
+    }
   </style>
 </head>
 <body>
